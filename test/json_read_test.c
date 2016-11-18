@@ -14,8 +14,8 @@ void test_one_int(void)
     int meaning;
   } one_int_struct;
 
-  make_cerial(one_int_struct,
-    c_access(one_int_struct, meaning, cerial_int)
+  make_cerial(one_int_struct, cerial_option_no_root,
+    cerial_access(one_int_struct, meaning, cerial_int)
   );
 
   one_int_struct test_struct;
@@ -24,6 +24,25 @@ void test_one_int(void)
   size_t bytes = cerial_read_json(&one_int_struct_cerial, &test_struct, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(test_struct.meaning == 42);
+}
+
+void test_root(void)
+{
+  char *sample = "{\"root\":{\"evil\": \"money\"} }";
+  typedef struct {
+    char evil[12];
+  } root;
+
+  make_cerial(root, 0,
+    cerial_access(root, evil, cerial_str, {12})
+  );
+
+  root test;
+  strcpy(test.evil, "ccccccccc");
+
+  size_t bytes = cerial_read_json(&root_cerial, &test, sample, strlen(sample));
+  assert(bytes == strlen(sample));
+  assert(strcmp(test.evil, "money") == 0);
 }
 
 void test_two_int(void)
@@ -35,9 +54,9 @@ void test_two_int(void)
     int second;
   } two_int_struct;
 
-  make_cerial(two_int_struct,
-    c_access(two_int_struct, first, cerial_int),
-    c_access(two_int_struct, second, cerial_int)
+  make_cerial(two_int_struct, cerial_option_no_root,
+    cerial_access(two_int_struct, first, cerial_int),
+    cerial_access(two_int_struct, second, cerial_int)
   );
 
   two_int_struct test_struct;
@@ -57,8 +76,8 @@ void test_string(void)
     char food[12];
   } foods_struct;
 
-  make_cerial(foods_struct,
-    c_access(foods_struct, food, cerial_str, {12})
+  make_cerial(foods_struct, cerial_option_no_root,
+    cerial_access(foods_struct, food, cerial_str, {12})
   );
 
   foods_struct test_struct;
@@ -76,9 +95,9 @@ void test_bool(void)
     bool falsehood;
   } thruthiness_struct;
 
-  make_cerial(thruthiness_struct,
-    c_access(thruthiness_struct, truthy, cerial_bool),
-    c_access(thruthiness_struct, falsehood, cerial_bool)
+  make_cerial(thruthiness_struct, cerial_option_no_root,
+    cerial_access(thruthiness_struct, truthy, cerial_bool),
+    cerial_access(thruthiness_struct, falsehood, cerial_bool)
   );
 
   thruthiness_struct test_struct;
@@ -101,13 +120,13 @@ void test_object(void)
     person noone;
   } people;
 
-  make_cerial(person,
-    c_access(person, is_awesome, cerial_bool)
+  make_cerial(person, cerial_option_no_root,
+    cerial_access(person, is_awesome, cerial_bool)
   );
 
-  make_cerial(people,
-    c_access(people, me, cerial_object, {.super_cerial=&person_cerial}),
-    c_access(people, noone, cerial_object, {.super_cerial=&person_cerial})
+  make_cerial(people, cerial_option_no_root,
+    cerial_access(people, me, cerial_object, {.super_cerial=&person_cerial}),
+    cerial_access(people, noone, cerial_object, {.super_cerial=&person_cerial})
   );
 
   people test_people;
@@ -125,8 +144,8 @@ void test_array(void)
     int numbers[2];
   } array;
 
-  make_cerial(array,
-    c_access(array, numbers, cerial_int, {2}, true)
+  make_cerial(array, cerial_option_no_root,
+    cerial_access(array, numbers, cerial_int, {2}, true)
   );
 
   array array_test;
@@ -140,6 +159,7 @@ void test_array(void)
 int main(void)
 {
   test_one_int();
+  test_root();
   test_two_int();
   test_string();
   test_bool();

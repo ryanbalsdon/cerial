@@ -6,11 +6,20 @@
 #include <ctype.h>
 #include "cerial.h"
 
+size_t cerial_accessor_size(cerial_accessor accessor);
 static char* cerial_write_json_value(cerial_accessor accessor, const void *object, char *head, const char *end);
 
 size_t cerial_write_json(cerial *self, const void *object, char *buffer, size_t size) {
   char *head = buffer;
   const char *end = head + size;
+
+  if (!(self->options & cerial_option_no_root)) {
+    size_t bytes_left = end - head;
+    size_t bytes_written = snprintf(head, end - head, "{\"%s\": ", self->name);
+    if (bytes_left <= bytes_written) return 0;
+    head += bytes_written;
+  }
+
   if (end - head < 2) return 0;
   head += snprintf(head, end - head, "{");
 
@@ -51,6 +60,11 @@ size_t cerial_write_json(cerial *self, const void *object, char *buffer, size_t 
 
   if (end - head < 2) return 0;
   head += snprintf(head, end - head, "}");
+
+  if (!(self->options & cerial_option_no_root)) {
+    if (end - head < 2) return 0;
+    head += snprintf(head, end - head, "}");
+  }
 
   return head - buffer;
 }
