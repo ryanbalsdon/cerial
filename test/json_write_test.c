@@ -9,6 +9,7 @@
 
 void test_one_int(void)
 {
+  printf("test_one_int\n");
   char output[1024];
 
   typedef struct {
@@ -29,6 +30,7 @@ void test_one_int(void)
 
 void test_root(void)
 {
+  printf("test_root\n");
   char output[1024];
   char *expected = "{\"root\": {\"evil\": \"money\"}}";
   typedef struct {
@@ -49,6 +51,7 @@ void test_root(void)
 
 void test_two_int(void)
 {
+  printf("test_two_int\n");
   char output[1024];
 
   typedef struct {
@@ -72,6 +75,7 @@ void test_two_int(void)
 
 void test_string(void)
 {
+  printf("test_string\n");
   char output[1024];
 
   typedef struct {
@@ -92,6 +96,7 @@ void test_string(void)
 
 void test_bool(void)
 {
+  printf("test_bool\n");
   char output[1024];
 
   typedef struct {
@@ -117,6 +122,7 @@ void test_bool(void)
 
 void test_object(void)
 {
+  printf("test_object\n");
   char output[1024];
   char *expected = "{\"me\": {\"is_awesome\": true}, \"noone\": {\"is_awesome\": false}}";
 
@@ -149,6 +155,7 @@ void test_object(void)
 
 void test_array(void)
 {
+  printf("test_array\n");
   char output[1024];
   char *expected = "{\"numbers\": [22, 64]}";
   typedef struct {

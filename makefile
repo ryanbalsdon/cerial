@@ -25,5 +25,5 @@ clean:
 objects/$(OUTPUT): $(OBJS)
 	$(AR) rcs $@ $(OBJS)
 
-objects/%.o: src/%.c $(wildcard include/*.h)
+objects/%.o: src/%.c $(wildcard include/*.h) $(wildcard src/*.h)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $<

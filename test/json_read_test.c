@@ -9,6 +9,7 @@
 
 void test_one_int(void)
 {
+  printf("test_one_int\n");
   char *sample = " { \"meaning\": 42 } ";
   typedef struct {
     int meaning;
@@ -28,6 +29,7 @@ void test_one_int(void)
 
 void test_root(void)
 {
+  printf("test_root\n");
   char *sample = "{\"root\":{\"evil\": \"money\"} }";
   typedef struct {
     char evil[12];
@@ -47,6 +49,7 @@ void test_root(void)
 
 void test_two_int(void)
 {
+  printf("test_two_int\n");
   char *sample = "{\"first\":16, \"second\": 1024}";
 
   typedef struct {
@@ -71,6 +74,7 @@ void test_two_int(void)
 
 void test_string(void)
 {
+  printf("test_string\n");
   char *sample = " { \"food\": \"pizza\" } ";
   typedef struct {
     char food[12];
@@ -89,6 +93,7 @@ void test_string(void)
 
 void test_bool(void)
 {
+  printf("test_bool\n");
   char *sample = "{ \"truthy\": true, \"falsehood\": false }";
   typedef struct {
     bool truthy;
@@ -110,6 +115,7 @@ void test_bool(void)
 
 void test_object(void)
 {
+  printf("test_object\n");
   char *sample = "{ \"me\": { \"is_awesome\": true }, \"noone\": {\"is_awesome\": false}}";
   typedef struct {
     bool is_awesome;
@@ -139,6 +145,7 @@ void test_object(void)
 
 void test_array(void)
 {
+  printf("test_array\n");
   char *sample = "{ \"numbers\": [22 , 64 ] }";
   typedef struct {
     int numbers[2];
