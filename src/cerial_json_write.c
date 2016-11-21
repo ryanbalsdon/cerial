@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "cerial.h"
 
-// #define DEBUG
+#define DEBUG
 #include "cerial_internal.h"
 
 static char* cerial_write_json_value(cerial_accessor accessor, const void *object, char *head, const char *end);
@@ -80,41 +80,27 @@ static char* cerial_write_json_array(cerial_accessor accessor, const void *objec
 
 static char* cerial_write_json_value(cerial_accessor accessor, const void *object, char *head, const char *end) {
   if (accessor.type == cerial_int) {
-    size_t bytes_left = end - head;
-    size_t bytes_written = snprintf(head, bytes_left, "%d", *(int*)((char*)object + accessor.offset));
-    if (!cerial_assert(bytes_left > bytes_written)) return 0;
-    head += bytes_written;
+    head += snprintf(head, end - head, "%d", *(int*)((char*)object + accessor.offset));
   }
   else if (accessor.type == cerial_float) {
-    size_t bytes_left = end - head;
-    size_t bytes_written = snprintf(head, bytes_left, "%f", *(float*)((char*)object + accessor.offset));
-    if (!cerial_assert(bytes_left > bytes_written)) return 0;
-    head += bytes_written;
+    head += snprintf(head, end - head, "%f", *(float*)((char*)object + accessor.offset));
   }
   else if (accessor.type == cerial_double) {
-    size_t bytes_left = end - head;
-    size_t bytes_written = snprintf(head, bytes_left, "%f", *(double*)((char*)object + accessor.offset));
-    if (!cerial_assert(bytes_left > bytes_written)) return 0;
-    head += bytes_written;
+    head += snprintf(head, end - head, "%f", *(double*)((char*)object + accessor.offset));
   }
   else if (accessor.type == cerial_str) {
-    size_t bytes_left = end - head;
-    size_t bytes_written = snprintf(head, bytes_left, "\"%s\"", ((char*)object + accessor.offset));
-    if (!cerial_assert(bytes_left > bytes_written)) return 0;
-    head += bytes_written;
+    head += snprintf(head, end - head, "\"%s\"", ((char*)object + accessor.offset));
   }
   else if (accessor.type == cerial_bool) {
-    size_t bytes_left = end - head;
     const char *value = *(bool*)((char*)object + accessor.offset) ? "true" : "false";
-    size_t bytes_written = snprintf(head, bytes_left, "%s", value);
-    if (!cerial_assert(bytes_left > bytes_written)) return 0;
-    head += bytes_written;
+    head += snprintf(head, end - head, "%s", value);
   }
   else if (accessor.type == cerial_object) {
     size_t bytes_written = cerial_write_json(accessor.super_cerial, (const void*)((const char*)object + accessor.offset), head, end-head);
     if (!cerial_assert(bytes_written)) return 0;
     head += bytes_written;
   }
+  if (!cerial_assert(head <= end)) return 0;
 
   return head;
 }
