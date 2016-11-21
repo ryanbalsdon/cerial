@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "cerial.h"
 
-#define DEBUG
+// #define DEBUG
 #include "cerial_internal.h"
 
 typedef struct {
@@ -34,6 +34,7 @@ static size_t cerial_read_json_object(cerial *self, void *output, const char *st
   const char *value_end = NULL;
 
   while(1) {
+    if (!cerial_assert(head < end)) return 0;
     cerial_json_key key = cerial_read_json_key(head, end);
     if (!cerial_assert(key.start)) return 0;
     if (!cerial_assert(key.end))   return 0;

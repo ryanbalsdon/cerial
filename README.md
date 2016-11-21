@@ -21,7 +21,7 @@ Then make_cerial!
 
 This will create a new cerial instance called fish_pond_cerial.
 
-Next call either cerial_read_json or cerial_write_json with fish_pond_cerial and a string buffer.
+Next call either cerial_read_json with fish_pond_cerial and a string buffer.
 ```
 char *json_input = "{\number_of_fish_in_pond\": 6, \"average_fish_weight\": 63.12}"
 fish_pond lake_pleasant = {0};
@@ -30,7 +30,37 @@ cerial_read_json(&fish_pond_cerial, &lake_pleasant, json_input, strlen(json_inpu
 // assert(lake_pleasant.average_fish_weight == 63.12);
 ```
 
+## JSON Support
+
+This library has full, to-spec support for JSON.
+
+## XML Support
+
+XML support isn't complete. It is capable of writing all the same data types as the JSON side but is not a complete to-spec XML reader. It should read your XML schema if you're using it as a dictionary.
+
+### XML Booleans
+
+Booleans are `true` or `false`. Uppercase forms are not supported.
+
+### XML Arrays
+
+Arrays have a single node with the member name and many `value` nodes with the array contents.
+
+```
+<leg_colours>
+  <value>0xffee55</value>
+  <value>0x0055aa</value>
+  <value>0x335599</value>
+  <value>0x3498a7</value>
+</leg_colours>
+```
+
+### Values in tags
+
+Values or other keys embedded in a tag (`<colour value="red"/>`) are not currently supported.
+
+
 ## Roadmap
- - Serialize directly from/to a file/stream
- - XML Support
  - X690/ASN1 support
+ - Serialize directly from/to a file/stream
+ - More-complete XML Support
