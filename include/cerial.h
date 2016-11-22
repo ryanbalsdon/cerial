@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef enum {
   cerial_int,
@@ -62,5 +63,6 @@ size_t cerial_read_json(cerial *self, void *output, const char *string, size_t s
 size_t cerial_write_json(cerial *self, const void *object, char *output, size_t size);
 size_t cerial_read_xml(cerial *self, void *output, const char *string, size_t size);
 size_t cerial_write_xml(cerial *self, const void *object, char *output, size_t size);
+size_t cerial_read_x690(cerial *self, void *output, const uint8_t *bytes, size_t size);
 
 #endif /* CERIAL_H */

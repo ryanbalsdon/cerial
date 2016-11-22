@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "cerial.h"
 
-#define DEBUG
+// #define DEBUG
 #include "cerial_internal.h"
 
 static char* cerial_write_json_value(cerial_accessor accessor, const void *object, char *head, const char *end);

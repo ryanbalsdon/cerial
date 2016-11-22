@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "cerial.h"
 
-#define DEBUG
+// #define DEBUG
 #include "cerial_internal.h"
 
 typedef struct {
