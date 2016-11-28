@@ -22,7 +22,7 @@ void test_one_int(void)
   one_int test_object;
   test_object.meaning = 0xcc;
 
-  size_t bytes = cerial_read_xml(&one_int_cerial, &test_object, sample, strlen(sample));
+  size_t bytes = cerial_xml_read(&one_int_cerial, &test_object, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(test_object.meaning == 42);
 }
@@ -44,7 +44,7 @@ void test_root(void)
   one_int test_object;
   test_object.meaning = 0xcc;
 
-  size_t bytes = cerial_read_xml(&one_int_cerial, &test_object, sample, strlen(sample));
+  size_t bytes = cerial_xml_read(&one_int_cerial, &test_object, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(test_object.meaning == 42);
 }
@@ -70,7 +70,7 @@ void test_two_int(void)
   my_shop.broken_tires = 0xcc;
   my_shop.fixed_tires = 0xcc;
 
-  size_t bytes = cerial_read_xml(&car_shop_cerial, &my_shop, sample, strlen(sample));
+  size_t bytes = cerial_xml_read(&car_shop_cerial, &my_shop, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(my_shop.broken_tires == 21);
   assert(my_shop.fixed_tires == 6);
@@ -93,7 +93,7 @@ void test_string(void)
   badge the_badge;
   strcpy(the_badge.serial, "cccccc");
 
-  size_t bytes = cerial_read_xml(&badge_cerial, &the_badge, sample, strlen(sample));
+  size_t bytes = cerial_xml_read(&badge_cerial, &the_badge, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(strcmp(the_badge.serial, "x609") == 0);
 }
@@ -114,7 +114,7 @@ void test_bool(void)
 
   table dining_room_table = {0};
 
-  size_t bytes = cerial_read_xml(&table_cerial, &dining_room_table, sample, strlen(sample));
+  size_t bytes = cerial_xml_read(&table_cerial, &dining_room_table, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(dining_room_table.has_legs == true);
 }
@@ -159,7 +159,7 @@ void test_object(void)
   dining_room_table.second_leg.round = true;
 
 
-  size_t bytes = cerial_read_xml(&table_cerial, &dining_room_table, sample, strlen(sample));
+  size_t bytes = cerial_xml_read(&table_cerial, &dining_room_table, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(dining_room_table.first_leg.is_broken == false);
   assert(dining_room_table.first_leg.round == true);
@@ -193,7 +193,7 @@ void test_array(void)
   dining_room_table.leg_colours[2] = 0xcccccc;
   dining_room_table.leg_colours[3] = 0xcccccc;
 
-  size_t bytes = cerial_read_xml(&table_cerial, &dining_room_table, sample, strlen(sample));
+  size_t bytes = cerial_xml_read(&table_cerial, &dining_room_table, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(dining_room_table.leg_colours[0] == 0xffee55);
   assert(dining_room_table.leg_colours[1] == 0x0055aa);

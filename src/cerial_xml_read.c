@@ -16,24 +16,24 @@ typedef struct {
   const char *close_end;
 } cerial_xml_tag;
 
-size_t cerial_read_xml_object(cerial *self, void *output, const char *string, size_t size, bool read_root);
-static bool cerial_read_xml_value(cerial_accessor accessor, void *output, const char *value_start, const char *value_end);
-static cerial_xml_tag cerial_read_xml_tag(const char *head, const char *end);
+size_t cerial_xml_read_object(cerial *self, void *output, const char *string, size_t size, bool read_root);
+static bool cerial_xml_read_value(cerial_accessor accessor, void *output, const char *value_start, const char *value_end);
+static cerial_xml_tag cerial_xml_read_tag(const char *head, const char *end);
 
 
-size_t cerial_read_xml(cerial *self, void *output, const char *string, size_t size)
+size_t cerial_xml_read(cerial *self, void *output, const char *string, size_t size)
 {
-  return cerial_read_xml_object(self, output, string, size, true);
+  return cerial_xml_read_object(self, output, string, size, true);
 }
 
-size_t cerial_read_xml_object(cerial *self, void *output, const char *string, size_t size, bool read_root)
+size_t cerial_xml_read_object(cerial *self, void *output, const char *string, size_t size, bool read_root)
 {
   const char *end = string + size;
   const char *head = string;
   if (!cerial_assert(head)) return 0;
 
   while (1) {
-    cerial_xml_tag tag = cerial_read_xml_tag(head, end);
+    cerial_xml_tag tag = cerial_xml_read_tag(head, end);
     if (!cerial_assert(tag.open_start)) return 0;
 
     size_t key_size = tag.open_end - tag.open_start - 1;
@@ -44,7 +44,7 @@ size_t cerial_read_xml_object(cerial *self, void *output, const char *string, si
       size_t name_size = strlen(self->name);
       if (!cerial_assert(key_size == name_size)) return 0;
       if (!cerial_assert(strncmp(self->name, tag.open_start+1, name_size) == 0)) return 0;
-      size_t bytes = cerial_read_xml_object(self, output, value_start, value_end - value_start, false);
+      size_t bytes = cerial_xml_read_object(self, output, value_start, value_end - value_start, false);
       if (!cerial_assert(bytes == value_end - value_start)) return 0;
     }
     else for (int i=0; i<self->count; i++) {
@@ -56,21 +56,21 @@ size_t cerial_read_xml_object(cerial *self, void *output, const char *string, si
           size_t array_output_increment = cerial_accessor_size(accessor);
 
           while (value_start < value_end) {
-            cerial_xml_tag value_tag = cerial_read_xml_tag(value_start, value_end);
+            cerial_xml_tag value_tag = cerial_xml_read_tag(value_start, value_end);
             if (!cerial_assert(value_tag.open_start)) return 0;
             size_t value_key_size = value_tag.open_end - value_tag.open_start - 1;
             if (!cerial_assert(5 == value_key_size)) return 0;
             if (!cerial_assert(strncmp("value", value_tag.open_start+1, 5) == 0)) return 0;
             const char *array_value_start = value_tag.open_end+1;
             const char *array_value_end = value_tag.close_start;
-            if (!cerial_assert(cerial_read_xml_value(accessor, array_output, array_value_start, array_value_end))) return 0;
+            if (!cerial_assert(cerial_xml_read_value(accessor, array_output, array_value_start, array_value_end))) return 0;
             value_start = value_tag.close_end + 1;
             while (isspace(*value_start) && value_start < value_end) value_start++;
             array_output += array_output_increment;
           }
         }
         else {
-          if (!cerial_assert(cerial_read_xml_value(accessor, output, value_start, value_end))) return 0;
+          if (!cerial_assert(cerial_xml_read_value(accessor, output, value_start, value_end))) return 0;
         }
       }
     }
@@ -83,7 +83,7 @@ size_t cerial_read_xml_object(cerial *self, void *output, const char *string, si
   return head - string;
 }
 
-static cerial_xml_tag cerial_read_xml_tag(const char *head, const char *end)
+static cerial_xml_tag cerial_xml_read_tag(const char *head, const char *end)
 {
   cerial_xml_tag tag = {0};
   if (!cerial_assert(head < end)) return (cerial_xml_tag){0};
@@ -108,7 +108,7 @@ static cerial_xml_tag cerial_read_xml_tag(const char *head, const char *end)
   return tag;
 }
 
-static bool cerial_read_xml_value(cerial_accessor accessor, void *output, const char *value_start, const char *value_end)
+static bool cerial_xml_read_value(cerial_accessor accessor, void *output, const char *value_start, const char *value_end)
 {
   if (accessor.type == cerial_int) {
     char *int_end = NULL;
@@ -147,7 +147,7 @@ static bool cerial_read_xml_value(cerial_accessor accessor, void *output, const 
     }
   }
   else if (accessor.type == cerial_object) {
-    size_t super_bytes = cerial_read_xml_object(accessor.super_cerial, (void*)((char*)output + accessor.offset), value_start, value_end - value_start, true);
+    size_t super_bytes = cerial_xml_read_object(accessor.super_cerial, (void*)((char*)output + accessor.offset), value_start, value_end - value_start, true);
     if (!cerial_assert(super_bytes)) return 0;
     if (!cerial_assert(super_bytes <= value_end - value_start)) return 0;
   }

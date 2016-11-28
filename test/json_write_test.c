@@ -23,7 +23,7 @@ void test_one_int(void)
   test_object.meaning = 42;
   char *expected = "{\"meaning\": 42}";
 
-  size_t bytes = cerial_write_json(&one_int_cerial, &test_object, output, 1024);
+  size_t bytes = cerial_json_write(&one_int_cerial, &test_object, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -44,7 +44,7 @@ void test_root(void)
   root test;
   strcpy(test.evil, "money");
 
-  size_t bytes = cerial_write_json(&root_cerial, &test, output, 1024);
+  size_t bytes = cerial_json_write(&root_cerial, &test, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -68,7 +68,7 @@ void test_two_int(void)
   test_object.second = 1024;
   char *expected = "{\"first\": 16, \"second\": 1024}";
 
-  size_t bytes = cerial_write_json(&two_int_cerial, &test_object, output, 1024);
+  size_t bytes = cerial_json_write(&two_int_cerial, &test_object, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -89,7 +89,7 @@ void test_string(void)
   strcpy(test_object.stuff, "testor");
   char *expected = "{\"stuff\": \"testor\"}";
 
-  size_t bytes = cerial_write_json(&string_cerial, &test_object, output, 1024);
+  size_t bytes = cerial_json_write(&string_cerial, &test_object, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -115,7 +115,7 @@ void test_bool(void)
 
   char *expected = "{\"truthy\": true, \"falsehood\": false}";
 
-  size_t bytes = cerial_write_json(&thruthiness_struct_cerial, &test_object, output, 1024);
+  size_t bytes = cerial_json_write(&thruthiness_struct_cerial, &test_object, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -148,7 +148,7 @@ void test_object(void)
   test_people.me.is_awesome = true;
   test_people.noone.is_awesome = false;
 
-  size_t bytes = cerial_write_json(&people_cerial, &test_people, output, 1024);
+  size_t bytes = cerial_json_write(&people_cerial, &test_people, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -170,7 +170,7 @@ void test_array(void)
   array_test.numbers[0] = 22;
   array_test.numbers[1] = 64;
 
-  size_t bytes = cerial_write_json(&array_cerial, &array_test, output, 1024);
+  size_t bytes = cerial_json_write(&array_cerial, &array_test, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }

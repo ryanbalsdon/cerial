@@ -9,10 +9,10 @@
 // #define DEBUG
 #include "cerial_internal.h"
 
-static char* cerial_write_json_value(cerial_accessor accessor, const void *object, char *head, const char *end);
-static char* cerial_write_json_array(cerial_accessor accessor, const void *object, char *head, const char *end);
+static char* cerial_json_write_value(cerial_accessor accessor, const void *object, char *head, const char *end);
+static char* cerial_json_write_array(cerial_accessor accessor, const void *object, char *head, const char *end);
 
-size_t cerial_write_json(cerial *self, const void *object, char *buffer, size_t size) {
+size_t cerial_json_write(cerial *self, const void *object, char *buffer, size_t size) {
   char *head = buffer;
   const char *end = head + size;
 
@@ -32,10 +32,10 @@ size_t cerial_write_json(cerial *self, const void *object, char *buffer, size_t 
     head += snprintf(head, end - head, "\"%s\": ", accessor.name);
 
     if (accessor.is_array) {
-      head = cerial_write_json_array(accessor, object, head, end);
+      head = cerial_json_write_array(accessor, object, head, end);
     }
     else {
-      head = cerial_write_json_value(accessor, object, head, end);
+      head = cerial_json_write_value(accessor, object, head, end);
     }
     if (!cerial_assert(head)) return 0;
 
@@ -56,7 +56,7 @@ size_t cerial_write_json(cerial *self, const void *object, char *buffer, size_t 
   return head - buffer;
 }
 
-static char* cerial_write_json_array(cerial_accessor accessor, const void *object, char *head, const char *end)
+static char* cerial_json_write_array(cerial_accessor accessor, const void *object, char *head, const char *end)
 {
   if (!cerial_assert(end - head >= 2)) return 0;
   head += snprintf(head, end - head, "[");
@@ -64,7 +64,7 @@ static char* cerial_write_json_array(cerial_accessor accessor, const void *objec
   size_t object_increment = cerial_accessor_size(accessor);
 
   for (int j=0; j<accessor.buffer_size; j++) {
-    head = cerial_write_json_value(accessor, object_head, head, end);
+    head = cerial_json_write_value(accessor, object_head, head, end);
     if (!cerial_assert(head)) return 0;
     object_head += object_increment;
     if (j < accessor.buffer_size - 1) {
@@ -78,7 +78,7 @@ static char* cerial_write_json_array(cerial_accessor accessor, const void *objec
   return head;
 }
 
-static char* cerial_write_json_value(cerial_accessor accessor, const void *object, char *head, const char *end) {
+static char* cerial_json_write_value(cerial_accessor accessor, const void *object, char *head, const char *end) {
   if (accessor.type == cerial_int) {
     head += snprintf(head, end - head, "%d", *(int*)((char*)object + accessor.offset));
   }
@@ -96,7 +96,7 @@ static char* cerial_write_json_value(cerial_accessor accessor, const void *objec
     head += snprintf(head, end - head, "%s", value);
   }
   else if (accessor.type == cerial_object) {
-    size_t bytes_written = cerial_write_json(accessor.super_cerial, (const void*)((const char*)object + accessor.offset), head, end-head);
+    size_t bytes_written = cerial_json_write(accessor.super_cerial, (const void*)((const char*)object + accessor.offset), head, end-head);
     if (!cerial_assert(bytes_written)) return 0;
     head += bytes_written;
   }

@@ -24,7 +24,7 @@ void test_bool(void)
     one_bool not_true;
     not_true.this_is_true = false;
     uint8_t definite_short[] = {0x01, 0x01, 0x01};
-    size_t bytes_read = cerial_read_x690(&one_bool_cerial, &not_true, definite_short, sizeof(definite_short));
+    size_t bytes_read = cerial_x690_read(&one_bool_cerial, &not_true, definite_short, sizeof(definite_short));
     assert(bytes_read == sizeof(definite_short));
     assert(not_true.this_is_true);
   }
@@ -33,7 +33,7 @@ void test_bool(void)
     one_bool not_true;
     not_true.this_is_true = false;
     uint8_t definite_long[] = {0x01, 0x82, 0x00, 0x01, 0xFF};
-    size_t bytes_read = cerial_read_x690(&one_bool_cerial, &not_true, definite_long, sizeof(definite_long));
+    size_t bytes_read = cerial_x690_read(&one_bool_cerial, &not_true, definite_long, sizeof(definite_long));
     assert(bytes_read == sizeof(definite_long));
     assert(not_true.this_is_true);
   }
@@ -42,7 +42,7 @@ void test_bool(void)
     one_bool not_true;
     not_true.this_is_true = false;
     uint8_t indefinite[] = {0x01, 0x80, 0x01, 0x00, 0x00};
-    size_t bytes_read = cerial_read_x690(&one_bool_cerial, &not_true, indefinite, sizeof(indefinite));
+    size_t bytes_read = cerial_x690_read(&one_bool_cerial, &not_true, indefinite, sizeof(indefinite));
     assert(bytes_read == sizeof(indefinite));
     assert(not_true.this_is_true);
   }
@@ -66,7 +66,7 @@ void test_two_int(void)
   test_object.negative = 0xCCCCCCCC;
   test_object.large = 0xCCCCCCCC;
 
-  size_t bytes = cerial_read_x690(&double_int_cerial, &test_object, sample, sizeof(sample));
+  size_t bytes = cerial_x690_read(&double_int_cerial, &test_object, sample, sizeof(sample));
   assert(bytes == sizeof(sample));
   assert(test_object.negative == -4);
   assert(test_object.large == 4096);
@@ -75,7 +75,6 @@ void test_two_int(void)
 void test_float(void)
 {
   printf("test_float\n");
-  uint8_t sample[] = {0x09, 0x00, 0x09, 0x01, 0x40, 0x09, 0x03, 0xA9, 0x02, 0xAA};
   typedef struct {
     float bitterness;
     double sugar;
@@ -92,11 +91,27 @@ void test_float(void)
   coffee.sugar = (float)0xCCCCCCCC;
   coffee.milk = (float)0xCCCCCCCC;
 
-  size_t bytes = cerial_read_x690(&double_double_cerial, &coffee, sample, sizeof(sample));
-  assert(bytes == sizeof(sample));
-  assert(coffee.bitterness == 0.0);
-  assert(coffee.sugar == INFINITY);
-  assert(coffee.milk == 2720.0);
+  {
+    uint8_t sample[] = {0x09, 0x00, 0x09, 0x01, 0x40, 0x09, 0x03, 0xA8, 0x02, 0xAA};
+    size_t bytes = cerial_x690_read(&double_double_cerial, &coffee, sample, sizeof(sample));
+    assert(bytes == sizeof(sample));
+    assert(coffee.bitterness == 0.0);
+    assert(coffee.sugar == INFINITY);
+    assert(coffee.milk == 2720.0);
+  }
+
+  {
+    uint8_t sample[] = {
+      0x09, 0x03, 0xA0, 0xFC, 0x10,
+      0x09, 0x09, 0xE0, 0xCE, 0x10, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD,
+      0x09, 0x04, 0xA0, 0xFF, 0x15, 0x40
+    };
+    size_t bytes = cerial_x690_read(&double_double_cerial, &coffee, sample, sizeof(sample));
+    assert(bytes == sizeof(sample));
+    assert(coffee.bitterness == 1.0);
+    assert(coffee.sugar == -4.2);
+    assert(coffee.milk == 2720.0);
+  }
 }
 
 void test_string(void)
@@ -114,7 +129,7 @@ void test_string(void)
   greeting morning;
   strcpy(morning.text, "Goodbye");
 
-  size_t bytes = cerial_read_x690(&greeting_cerial, &morning, sample, sizeof(sample));
+  size_t bytes = cerial_x690_read(&greeting_cerial, &morning, sample, sizeof(sample));
   assert(bytes == sizeof(sample));
   assert(strcmp(morning.text, "Hello") == 0);
 }
@@ -150,7 +165,7 @@ void test_object(void)
   dining_room_table.second_leg.round = true;
 
 
-  size_t bytes = cerial_read_x690(&table_cerial, &dining_room_table, sample, sizeof(sample));
+  size_t bytes = cerial_x690_read(&table_cerial, &dining_room_table, sample, sizeof(sample));
   assert(bytes == sizeof(sample));
   assert(dining_room_table.first_leg.is_broken == false);
   assert(dining_room_table.first_leg.round == true);
@@ -183,7 +198,7 @@ void test_array(void)
   dining_room_table.leg_colours[2] = 0xcccccc;
   dining_room_table.leg_colours[3] = 0xcccccc;
 
-  size_t bytes = cerial_read_x690(&table_cerial, &dining_room_table, sample, sizeof(sample));
+  size_t bytes = cerial_x690_read(&table_cerial, &dining_room_table, sample, sizeof(sample));
   assert(bytes == sizeof(sample));
   assert(dining_room_table.leg_colours[0] == 0x7fee55);
   assert(dining_room_table.leg_colours[1] == 0x0055aa);
@@ -207,7 +222,7 @@ void test_root(void)
     one_bool not_true;
     not_true.this_is_true = false;
     uint8_t definite_short[] = {0x30, 0x03, 0x01, 0x01, 0x01};
-    size_t bytes_read = cerial_read_x690(&one_bool_cerial, &not_true, definite_short, sizeof(definite_short));
+    size_t bytes_read = cerial_x690_read(&one_bool_cerial, &not_true, definite_short, sizeof(definite_short));
     assert(bytes_read == sizeof(definite_short));
     assert(not_true.this_is_true);
   }
@@ -216,7 +231,7 @@ void test_root(void)
     one_bool not_true;
     not_true.this_is_true = false;
     uint8_t indefinite[] = {0x30, 0x80, 0x01, 0x01, 0x01, 0x00, 0x00};
-    size_t bytes_read = cerial_read_x690(&one_bool_cerial, &not_true, indefinite, sizeof(indefinite));
+    size_t bytes_read = cerial_x690_read(&one_bool_cerial, &not_true, indefinite, sizeof(indefinite));
     assert(bytes_read == sizeof(indefinite));
     assert(not_true.this_is_true);
   }

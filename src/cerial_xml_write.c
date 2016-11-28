@@ -9,11 +9,11 @@
 // #define DEBUG
 #include "cerial_internal.h"
 
-static char* cerial_write_xml_value(cerial_accessor accessor, const void *object, char *head, const char *end);
-static char* cerial_write_xml_array(cerial_accessor accessor, const void *object, char *head, const char *end);
+static char* cerial_xml_write_value(cerial_accessor accessor, const void *object, char *head, const char *end);
+static char* cerial_xml_write_array(cerial_accessor accessor, const void *object, char *head, const char *end);
 
 
-size_t cerial_write_xml(cerial *self, const void *object, char *output, size_t size)
+size_t cerial_xml_write(cerial *self, const void *object, char *output, size_t size)
 {
   char *head = output;
   const char *end = head + size;
@@ -29,10 +29,10 @@ size_t cerial_write_xml(cerial *self, const void *object, char *output, size_t s
     if (!cerial_assert(head <= end)) return 0;
 
     if (accessor.is_array) {
-      head = cerial_write_xml_array(accessor, object, head, end);
+      head = cerial_xml_write_array(accessor, object, head, end);
     }
     else {
-      head = cerial_write_xml_value(accessor, object, head, end);
+      head = cerial_xml_write_value(accessor, object, head, end);
     }
     if (!cerial_assert(head)) return 0;
 
@@ -49,7 +49,7 @@ size_t cerial_write_xml(cerial *self, const void *object, char *output, size_t s
   return head - output;
 }
 
-static char* cerial_write_xml_array(cerial_accessor accessor, const void *object, char *head, const char *end)
+static char* cerial_xml_write_array(cerial_accessor accessor, const void *object, char *head, const char *end)
 {
   if (!cerial_assert(end - head >= 2)) return 0;
   char *object_head = (char*)object;
@@ -59,7 +59,7 @@ static char* cerial_write_xml_array(cerial_accessor accessor, const void *object
     head += snprintf(head, end - head, "<value>");
     if (!cerial_assert(head <= end)) return 0;
 
-    head = cerial_write_xml_value(accessor, object_head, head, end);
+    head = cerial_xml_write_value(accessor, object_head, head, end);
     if (!cerial_assert(head)) return 0;
 
     head += snprintf(head, end - head, "</value>");
@@ -71,7 +71,7 @@ static char* cerial_write_xml_array(cerial_accessor accessor, const void *object
   return head;
 }
 
-static char* cerial_write_xml_value(cerial_accessor accessor, const void *object, char *head, const char *end)
+static char* cerial_xml_write_value(cerial_accessor accessor, const void *object, char *head, const char *end)
 {
   if (accessor.type == cerial_int) {
     head += snprintf(head, end - head, "%d", *(int*)((char*)object + accessor.offset));
@@ -90,7 +90,7 @@ static char* cerial_write_xml_value(cerial_accessor accessor, const void *object
     head += snprintf(head, end - head, "%s", value);
   }
   else if (accessor.type == cerial_object) {
-    size_t bytes_written = cerial_write_xml(accessor.super_cerial, (const void*)((const char*)object + accessor.offset), head, end-head);
+    size_t bytes_written = cerial_xml_write(accessor.super_cerial, (const void*)((const char*)object + accessor.offset), head, end-head);
     if (!cerial_assert(bytes_written)) return 0;
     head += bytes_written;
   }

@@ -24,7 +24,7 @@ void test_one_int(void)
   one_int test_object;
   test_object.meaning = 42;
 
-  size_t bytes = cerial_write_xml(&one_int_cerial, &test_object, output, 1024);
+  size_t bytes = cerial_xml_write(&one_int_cerial, &test_object, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -46,7 +46,7 @@ void test_root(void)
   one_int test_object;
   test_object.meaning = 42;
 
-  size_t bytes = cerial_write_xml(&one_int_cerial, &test_object, output, 1024);
+  size_t bytes = cerial_xml_write(&one_int_cerial, &test_object, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -71,7 +71,7 @@ void test_two_int(void)
   my_shop.broken_tires = 21;
   my_shop.fixed_tires = 6;
 
-  size_t bytes = cerial_write_xml(&car_shop_cerial, &my_shop, output, 1024);
+  size_t bytes = cerial_xml_write(&car_shop_cerial, &my_shop, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -93,7 +93,7 @@ void test_string(void)
   badge the_badge;
   strcpy(the_badge.serial, "x609");
 
-  size_t bytes = cerial_write_xml(&badge_cerial, &the_badge, output, 1024);
+  size_t bytes = cerial_xml_write(&badge_cerial, &the_badge, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -114,7 +114,7 @@ void test_bool(void)
 
   table dining_room_table = {true};
 
-  size_t bytes = cerial_write_xml(&table_cerial, &dining_room_table, output, 1024);
+  size_t bytes = cerial_xml_write(&table_cerial, &dining_room_table, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -160,7 +160,7 @@ void test_object(void)
   dining_room_table.second_leg.is_broken = true;
   dining_room_table.second_leg.round = false;
 
-  size_t bytes = cerial_write_xml(&table_cerial, &dining_room_table, output, 1024);
+  size_t bytes = cerial_xml_write(&table_cerial, &dining_room_table, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }
@@ -170,13 +170,13 @@ void test_array(void)
   printf("test_array\n");
   char output[1024];
   char *expected = "<table>"
-                   "<leg_colours>"
-                     "<value>16772693</value>"
-                     "<value>21930</value>"
-                     "<value>3364249</value>"
-                     "<value>3446951</value>"
-                   "</leg_colours>"
-                 "</table>";
+                     "<leg_colours>"
+                       "<value>16772693</value>"
+                       "<value>21930</value>"
+                       "<value>3364249</value>"
+                       "<value>3446951</value>"
+                     "</leg_colours>"
+                   "</table>";
 
   typedef struct {
     int leg_colours[4];
@@ -192,7 +192,7 @@ void test_array(void)
   dining_room_table.leg_colours[2] = 0x335599;
   dining_room_table.leg_colours[3] = 0x3498a7;
 
-  size_t bytes = cerial_write_xml(&table_cerial, &dining_room_table, output, 1024);
+  size_t bytes = cerial_xml_write(&table_cerial, &dining_room_table, output, 1024);
   assert(bytes == strlen(expected));
   assert(strcmp(expected, output) == 0);
 }

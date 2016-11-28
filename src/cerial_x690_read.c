@@ -21,18 +21,18 @@ typedef struct {
   size_t length;
 } cerial_x609_value;
 
-static long long cerial_read_x690_integer(const uint8_t *bytes, size_t length);
-static size_t cerial_read_x690_tag(const uint8_t *tag_start, const uint8_t *end, cerial_x609_tag *tag);
-static size_t cerial_read_x690_length(const uint8_t *tag_start, const uint8_t *end, cerial_x609_value *value);
-static size_t cerial_read_x690_value(cerial_accessor accessor, cerial_x609_tag tag, void *output, const uint8_t *value_start, size_t length);
-size_t cerial_read_x690_object(cerial *self, void *output, const uint8_t *bytes, size_t size, bool read_root);
+static long long cerial_x690_read_integer(const uint8_t *bytes, size_t length);
+static size_t cerial_x690_read_tag(const uint8_t *tag_start, const uint8_t *end, cerial_x609_tag *tag);
+static size_t cerial_x690_read_length(const uint8_t *tag_start, const uint8_t *end, cerial_x609_value *value);
+static size_t cerial_x690_read_value(cerial_accessor accessor, cerial_x609_tag tag, void *output, const uint8_t *value_start, size_t length);
+size_t cerial_x690_read_object(cerial *self, void *output, const uint8_t *bytes, size_t size, bool read_root);
 
-size_t cerial_read_x690(cerial *self, void *output, const uint8_t *bytes, size_t size)
+size_t cerial_x690_read(cerial *self, void *output, const uint8_t *bytes, size_t size)
 {
-  return cerial_read_x690_object(self, output, bytes, size, true);
+  return cerial_x690_read_object(self, output, bytes, size, true);
 }
 
-size_t cerial_read_x690_object(cerial *self, void *output, const uint8_t *bytes, size_t size, bool read_root)
+size_t cerial_x690_read_object(cerial *self, void *output, const uint8_t *bytes, size_t size, bool read_root)
 {
   const uint8_t *end = bytes + size;
   const uint8_t *head = bytes;
@@ -40,12 +40,12 @@ size_t cerial_read_x690_object(cerial *self, void *output, const uint8_t *bytes,
 
   if (read_root && !(self->options & cerial_option_no_root)) {
     cerial_x609_tag tag = {0};
-    size_t tag_size = cerial_read_x690_tag(head, end, &tag);
+    size_t tag_size = cerial_x690_read_tag(head, end, &tag);
     if (!cerial_assert(tag_size)) return 0;
     head += tag_size;
 
     cerial_x609_value value = {0};
-    size_t length_size = cerial_read_x690_length(head, end, &value);
+    size_t length_size = cerial_x690_read_length(head, end, &value);
     if (!cerial_assert(length_size)) return 0;
     head += length_size;
 
@@ -53,7 +53,7 @@ size_t cerial_read_x690_object(cerial *self, void *output, const uint8_t *bytes,
     if (!cerial_assert(tag.constructed == 0x01)) return 0;
     if (!cerial_assert(tag.number == 16)) return 0;
 
-    size_t object_bytes = cerial_read_x690_object(self, output, value.start, value.length, false);
+    size_t object_bytes = cerial_x690_read_object(self, output, value.start, value.length, false);
     if (!cerial_assert(object_bytes == value.length)) return 0;
     return head - bytes;
   }
@@ -61,12 +61,12 @@ size_t cerial_read_x690_object(cerial *self, void *output, const uint8_t *bytes,
   for (int i=0; i<self->count; i++) {
     cerial_accessor accessor = self->accessors[i];
     cerial_x609_tag tag = {0};
-    size_t tag_size = cerial_read_x690_tag(head, end, &tag);
+    size_t tag_size = cerial_x690_read_tag(head, end, &tag);
     if (!cerial_assert(tag_size)) return 0;
     head += tag_size;
 
     cerial_x609_value value = {0};
-    size_t length_size = cerial_read_x690_length(head, end, &value);
+    size_t length_size = cerial_x690_read_length(head, end, &value);
     if (!cerial_assert(length_size)) return 0;
     head += length_size;
 
@@ -78,23 +78,23 @@ size_t cerial_read_x690_object(cerial *self, void *output, const uint8_t *bytes,
 
       while (array_head < array_end) {
         cerial_x609_tag array_tag = {0};
-        size_t tag_size = cerial_read_x690_tag(array_head, array_end, &array_tag);
+        size_t tag_size = cerial_x690_read_tag(array_head, array_end, &array_tag);
         if (!cerial_assert(tag_size)) return 0;
         array_head += tag_size;
 
         cerial_x609_value array_value = {0};
-        size_t length_size = cerial_read_x690_length(array_head, array_end, &array_value);
+        size_t length_size = cerial_x690_read_length(array_head, array_end, &array_value);
         if (!cerial_assert(length_size)) return 0;
         array_head += length_size;
 
-        size_t bytes_read = cerial_read_x690_value(accessor, array_tag, array_output, array_value.start, array_value.length);
+        size_t bytes_read = cerial_x690_read_value(accessor, array_tag, array_output, array_value.start, array_value.length);
         if (!cerial_assert(bytes_read == array_value.length)) return 0;
 
         array_output += array_output_increment;
       }
     }
     else {
-      size_t bytes_read = cerial_read_x690_value(accessor, tag, output, value.start, value.length);
+      size_t bytes_read = cerial_x690_read_value(accessor, tag, output, value.start, value.length);
       if (!cerial_assert(bytes_read == value.length)) return 0;
     }
   }
@@ -102,7 +102,7 @@ size_t cerial_read_x690_object(cerial *self, void *output, const uint8_t *bytes,
   return head - bytes;
 }
 
-static size_t cerial_read_x690_tag(const uint8_t *head, const uint8_t *end, cerial_x609_tag *tag)
+static size_t cerial_x690_read_tag(const uint8_t *head, const uint8_t *end, cerial_x609_tag *tag)
 {
   const uint8_t *tag_start = head;
   tag->class = (*head & 0xC0) >> 6;
@@ -125,7 +125,7 @@ static size_t cerial_read_x690_tag(const uint8_t *head, const uint8_t *end, ceri
   return head - tag_start;
 }
 
-static size_t cerial_read_x690_length(const uint8_t *head, const uint8_t *end, cerial_x609_value *value)
+static size_t cerial_x690_read_length(const uint8_t *head, const uint8_t *end, cerial_x609_value *value)
 {
   const uint8_t *length_start = head;
   size_t length_of_length = *head;
@@ -165,7 +165,7 @@ static size_t cerial_read_x690_length(const uint8_t *head, const uint8_t *end, c
   return head - length_start;
 }
 
-static size_t cerial_read_x690_value(cerial_accessor accessor, cerial_x609_tag tag, void *output, const uint8_t *value_start, size_t length)
+static size_t cerial_x690_read_value(cerial_accessor accessor, cerial_x609_tag tag, void *output, const uint8_t *value_start, size_t length)
 {
   if (!cerial_assert(tag.class == 0x00)) return 0;
   if (accessor.type == cerial_bool) {
@@ -178,7 +178,7 @@ static size_t cerial_read_x690_value(cerial_accessor accessor, cerial_x609_tag t
     if (!cerial_assert(length <= cerial_accessor_size(accessor))) return 0;
     if (!cerial_assert(tag.constructed == 0x00)) return 0;
     if (!cerial_assert(tag.number == 0x02)) return 0;
-    long long thre = cerial_read_x690_integer(value_start, length);
+    long long thre = cerial_x690_read_integer(value_start, length);
     *(int*)((char*)output + accessor.offset) = (int)thre;
   }
   else if (accessor.type == cerial_float || accessor.type == cerial_double) {
@@ -190,11 +190,11 @@ static size_t cerial_read_x690_value(cerial_accessor accessor, cerial_x609_tag t
     if (length == 1 && *value_head == 0x40) value = +INFINITY;
     else if (length == 1 && *value_head == 0x41) value = -INFINITY;
     else if (length > 0) {
-      if (!cerial_assert(*value_head & 0x80)) return 0; //binary
+      if (!cerial_assert(*value_head & 0x80)) return 0; //binary only
       // {1 S bb ff ee} {Octets for E} {Octets for N}
       uint8_t negative = *value_head & 0x40;
       uint8_t base = (*value_head & 0x30) >> 4;
-      if (!cerial_assert(base == 0x02)) return 0; // base 16
+      if (!cerial_assert(base == 0x02)) return 0; // base 16 only
       uint8_t scaling_factor = (*value_head & 0x0C) >> 2;
       uint8_t exponent_length = *value_head & 0x03;
       if (exponent_length == 0x03) {
@@ -202,9 +202,10 @@ static size_t cerial_read_x690_value(cerial_accessor accessor, cerial_x609_tag t
         value_head++;
         exponent_length = 3 + *value_head;
       }
+      else exponent_length++;
       value_head++;
       if (!cerial_assert(length > exponent_length + 1)) return 0;
-      long long exponent = cerial_read_x690_integer(value_head, exponent_length);
+      long long exponent = cerial_x690_read_integer(value_head, exponent_length);
       value_head += exponent_length;
       unsigned long long mantissa = 0;
       for (const uint8_t *integer_byte = value_head; integer_byte < value_start + length; integer_byte++) {
@@ -229,14 +230,14 @@ static size_t cerial_read_x690_value(cerial_accessor accessor, cerial_x609_tag t
   else if (accessor.type == cerial_object) {
     if (!cerial_assert(tag.constructed == 0x01)) return 0;
     if (!cerial_assert(tag.number == 16)) return 0;
-    size_t super_bytes = cerial_read_x690(accessor.super_cerial, (void*)((char*)output + accessor.offset), value_start, length);
+    size_t super_bytes = cerial_x690_read(accessor.super_cerial, (void*)((char*)output + accessor.offset), value_start, length);
     if (!cerial_assert(super_bytes == length)) return 0;
   }
 
   return length;
 }
 
-static long long cerial_read_x690_integer(const uint8_t *bytes, size_t length)
+static long long cerial_x690_read_integer(const uint8_t *bytes, size_t length)
 {
   long long value = 0;
   for (size_t i=0; i<length; i++) {

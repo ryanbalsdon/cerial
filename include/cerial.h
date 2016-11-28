@@ -59,10 +59,11 @@ struct cerial {
     options\
   };
 
-size_t cerial_read_json(cerial *self, void *output, const char *string, size_t size);
-size_t cerial_write_json(cerial *self, const void *object, char *output, size_t size);
-size_t cerial_read_xml(cerial *self, void *output, const char *string, size_t size);
-size_t cerial_write_xml(cerial *self, const void *object, char *output, size_t size);
-size_t cerial_read_x690(cerial *self, void *output, const uint8_t *bytes, size_t size);
+size_t cerial_json_read(cerial *self, void *output, const char *string, size_t size);
+size_t cerial_json_write(cerial *self, const void *object, char *output, size_t size);
+size_t cerial_xml_read(cerial *self, void *output, const char *string, size_t size);
+size_t cerial_xml_write(cerial *self, const void *object, char *output, size_t size);
+size_t cerial_x690_read(cerial *self, void *output, const uint8_t *bytes, size_t size);
+size_t cerial_x690_write(cerial *self, const void *object, uint8_t *output, size_t size);
 
 #endif /* CERIAL_H */

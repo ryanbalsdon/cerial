@@ -22,7 +22,7 @@ void test_one_int(void)
   one_int_struct test_struct;
   test_struct.meaning = 0xcc;
 
-  size_t bytes = cerial_read_json(&one_int_struct_cerial, &test_struct, sample, strlen(sample));
+  size_t bytes = cerial_json_read(&one_int_struct_cerial, &test_struct, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(test_struct.meaning == 42);
 }
@@ -42,7 +42,7 @@ void test_root(void)
   root test;
   strcpy(test.evil, "ccccccccc");
 
-  size_t bytes = cerial_read_json(&root_cerial, &test, sample, strlen(sample));
+  size_t bytes = cerial_json_read(&root_cerial, &test, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(strcmp(test.evil, "money") == 0);
 }
@@ -66,7 +66,7 @@ void test_two_int(void)
   test_struct.first  = 0xcc;
   test_struct.second = 0xcc;
 
-  size_t bytes = cerial_read_json(&two_int_struct_cerial, &test_struct, sample, strlen(sample));
+  size_t bytes = cerial_json_read(&two_int_struct_cerial, &test_struct, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(test_struct.first == 16);
   assert(test_struct.second == 1024);
@@ -86,7 +86,7 @@ void test_string(void)
 
   foods_struct test_struct;
 
-  size_t bytes = cerial_read_json(&foods_struct_cerial, &test_struct, sample, strlen(sample));
+  size_t bytes = cerial_json_read(&foods_struct_cerial, &test_struct, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(strcmp(test_struct.food, "pizza") == 0);
 }
@@ -107,7 +107,7 @@ void test_bool(void)
 
   thruthiness_struct test_struct;
 
-  size_t bytes = cerial_read_json(&thruthiness_struct_cerial, &test_struct, sample, strlen(sample));
+  size_t bytes = cerial_json_read(&thruthiness_struct_cerial, &test_struct, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(test_struct.truthy);
   assert(!test_struct.falsehood);
@@ -137,7 +137,7 @@ void test_object(void)
 
   people test_people;
 
-  size_t bytes = cerial_read_json(&people_cerial, &test_people, sample, strlen(sample));
+  size_t bytes = cerial_json_read(&people_cerial, &test_people, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(test_people.me.is_awesome);
   assert(!test_people.noone.is_awesome);
@@ -157,7 +157,7 @@ void test_array(void)
 
   array array_test;
 
-  size_t bytes = cerial_read_json(&array_cerial, &array_test, sample, strlen(sample));
+  size_t bytes = cerial_json_read(&array_cerial, &array_test, sample, strlen(sample));
   assert(bytes == strlen(sample));
   assert(array_test.numbers[0] == 22);
   assert(array_test.numbers[1] == 64);
