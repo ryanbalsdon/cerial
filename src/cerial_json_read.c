@@ -184,14 +184,3 @@ static const char* cerial_json_read_value(cerial_accessor accessor, void *output
 
   return value_end;
 }
-
-size_t cerial_accessor_size(cerial_accessor accessor)
-{
-  if (accessor.type == cerial_int)    return sizeof(int);
-  if (accessor.type == cerial_float)  return sizeof(float);
-  if (accessor.type == cerial_double) return sizeof(double);
-  if (accessor.type == cerial_str)    return accessor.buffer_size;
-  if (accessor.type == cerial_bool)   return sizeof(bool);
-  if (accessor.type == cerial_object) return accessor.super_cerial->size;
-  return 0;
-}

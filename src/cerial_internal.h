@@ -6,4 +6,12 @@
 #endif
 
 #define cerial_assert(condition) ((condition) ? true : (debug_printf("%s:%d Failed assertion: %s\n", __FILE__, __LINE__, #condition), false))
-size_t cerial_accessor_size(cerial_accessor accessor);
+#define cerial_accessor_size(accessor) (\
+  accessor.type == cerial_int    ? sizeof(int) :\
+  accessor.type == cerial_float  ? sizeof(float) :\
+  accessor.type == cerial_double ? sizeof(double) :\
+  accessor.type == cerial_str    ? accessor.buffer_size :\
+  accessor.type == cerial_bool   ? sizeof(bool) :\
+  accessor.type == cerial_object ? accessor.super_cerial->size :\
+  0\
+)

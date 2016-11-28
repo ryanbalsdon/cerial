@@ -21,11 +21,11 @@ Then make_cerial!
 
 This will create a new cerial instance called fish_pond_cerial.
 
-Next call either cerial_read_json with fish_pond_cerial and a string buffer.
+Next call cerial_json_read with fish_pond_cerial and a string buffer.
 ```
 char *json_input = "{\number_of_fish_in_pond\": 6, \"average_fish_weight\": 63.12}"
 fish_pond lake_pleasant = {0};
-cerial_read_json(&fish_pond_cerial, &lake_pleasant, json_input, strlen(json_input));
+cerial_json_read(&fish_pond_cerial, &lake_pleasant, json_input, strlen(json_input));
 // assert(lake_pleasant.number_of_fish_in_pond == 6);
 // assert(lake_pleasant.average_fish_weight == 63.12);
 ```
@@ -59,8 +59,19 @@ Arrays have a single node with the member name and many `value` nodes with the a
 
 Values or other keys embedded in a tag (`<colour value="red"/>`) are not currently supported.
 
+## X.690 Support
+
+X.690 support isn't complete. It's missing support for some string types, bitstring/data type and non-universal (custom) tags.
+
+### Strings
+Character strings (char[]) are always written out as VisibleString. They can be read in as UTF8String, IA5String or VisibleString. All other string types are not supported.
+
+### Floating Point
+This library has full support for binary, base-16 floats. Decimal and non-base-16 floats are not supported.
+
 
 ## Roadmap
- - X690/ASN1 support
+ - Raw Data (bitstring) type
+ - X690/ASN1 custom tags
  - Serialize directly from/to a file/stream
  - More-complete XML Support
