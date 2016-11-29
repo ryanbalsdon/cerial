@@ -42,7 +42,6 @@ static size_t cerial_json_read_object(cerial *self, void *output, const char *st
 
     if (read_root && !(self->options & cerial_option_no_root)) {
       value_end = cerial_json_read_root(self, output, key, head, end);
-      if (!cerial_assert(value_end)) return 0;
     }
     else for (int i=0; i<self->count; i++) {
       cerial_accessor accessor = self->accessors[i];
@@ -55,9 +54,9 @@ static size_t cerial_json_read_object(cerial *self, void *output, const char *st
         else {
           value_end = cerial_json_read_value(accessor, output, key.value, end);
         }
-        if (!cerial_assert(value_end)) return 0;
       }
     }
+    if (!cerial_assert(value_end)) return 0;
 
     const char *next_key = memchr(value_end, ',', end-value_end);
     const char *next_object = memchr(value_end, '}', end-value_end);
@@ -140,13 +139,13 @@ static const char* cerial_json_read_value(cerial_accessor accessor, void *output
   }
   else if (accessor.type == cerial_float) {
     char *head = NULL;
-    *(int*)((char*)output + accessor.offset) = strtof(value_start, &head);
+    *(float*)((char*)output + accessor.offset) = strtof(value_start, &head);
     if (!cerial_assert(head)) return 0;
     value_end = head;
   }
   else if (accessor.type == cerial_double) {
     char *head = NULL;
-    *(int*)((char*)output + accessor.offset) = strtod(value_start, &head);
+    *(double*)((char*)output + accessor.offset) = strtod(value_start, &head);
     if (!cerial_assert(head)) return 0;
     value_end = head;
   }

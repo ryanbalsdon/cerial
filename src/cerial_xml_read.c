@@ -118,13 +118,13 @@ static bool cerial_xml_read_value(cerial_accessor accessor, void *output, const 
   }
   else if (accessor.type == cerial_float) {
     char *int_end = NULL;
-    *(int*)((char*)output + accessor.offset) = strtof(value_start, &int_end);
+    *(float*)((char*)output + accessor.offset) = strtof(value_start, &int_end);
     if (!cerial_assert(int_end)) return 0;
     if (!cerial_assert(int_end <= value_end)) return 0;
   }
   else if (accessor.type == cerial_double) {
     char *int_end = NULL;
-    *(int*)((char*)output + accessor.offset) = strtod(value_start, &int_end);
+    *(double*)((char*)output + accessor.offset) = strtod(value_start, &int_end);
     if (!cerial_assert(int_end)) return 0;
     if (!cerial_assert(int_end <= value_end)) return 0;
   }

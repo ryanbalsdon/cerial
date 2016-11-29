@@ -8,7 +8,7 @@
 #include <float.h>
 #include "cerial.h"
 
-#define DEBUG
+// #define DEBUG
 #include "cerial_internal.h"
 
 static size_t cerial_x690_get_int_length(long long integer);
