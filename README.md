@@ -1,4 +1,4 @@
-# Cerial
+# CReal
 A serialization library for C.
 
 The goals for this project were two: use zero calls to malloc and make all memory access sequential for cache-friendly behaviour. 
